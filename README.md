@@ -1,2 +1,2 @@
 # Shiro-Optimizer
-Just my own custom optimizer which i describe as my own best windows starter kit ! 🐛
+Just my own custom optimizer which I describe as my own best windows starter kit ! 🐛
