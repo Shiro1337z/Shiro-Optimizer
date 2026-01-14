@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shiro Optimizer Clone</title>
+    <title>Shiro Optimizer</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
+        /* --- SHARED & HOME STYLES --- */
         :root {
             --bg-dark: #050a14;
             --card-bg: #0b1221;
@@ -18,242 +19,448 @@
             --btn-gradient: linear-gradient(135deg, #22d3ee 0%, #3b82f6 100%);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { background-color: var(--bg-dark); color: var(--text-main); overflow-x: hidden; }
-        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
-        .highlight { background: -webkit-linear-gradient(left, #67e8f9, #3b82f6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background-color: var(--bg-dark); color: var(--text-main); font-family: 'Inter', sans-serif; overflow-x: hidden; }
+        
+        /* Utility to toggle views */
+        .view-section { width: 100%; }
+        
+        /* HOME SPECIFIC CSS */
+        #home-view .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        #home-view .highlight { background: -webkit-linear-gradient(left, #67e8f9, #3b82f6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
         /* Navigation */
-        nav { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; height: 80px; }
-        .logo { font-weight: 800; font-size: 1.25rem; display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text-main); }
-        .logo i { color: var(--accent-cyan); }
-        .nav-links { display: flex; gap: 30px; }
-        .nav-links a { color: var(--text-muted); text-decoration: none; font-size: 0.95rem; transition: color 0.3s; }
-        .nav-links a:hover { color: var(--text-main); }
-        .btn-nav { background: var(--btn-gradient); padding: 10px 20px; border-radius: 50px; text-decoration: none; color: white; font-weight: 600; font-size: 0.9rem; box-shadow: 0 0 15px rgba(34, 211, 238, 0.3); }
+        #home-view nav { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; height: 80px; }
+        #home-view .logo { font-weight: 800; font-size: 1.25rem; display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text-main); }
+        #home-view .logo i { color: var(--accent-cyan); }
+        #home-view .nav-links { display: flex; gap: 30px; }
+        #home-view .nav-links a, #home-view .nav-links button { 
+            color: var(--text-muted); text-decoration: none; font-size: 0.95rem; transition: color 0.3s; 
+            background: none; border: none; cursor: pointer; font-family: 'Inter', sans-serif;
+        }
+        #home-view .nav-links a:hover, #home-view .nav-links button:hover { color: var(--text-main); }
+        #home-view .btn-nav { background: var(--btn-gradient); padding: 10px 20px; border-radius: 50px; text-decoration: none; color: white; font-weight: 600; font-size: 0.9rem; box-shadow: 0 0 15px rgba(34, 211, 238, 0.3); }
 
         /* Hero */
-        .hero { text-align: center; padding: 100px 0 60px; }
-        .pill { display: inline-block; background: rgba(34, 211, 238, 0.1); border: 1px solid rgba(34, 211, 238, 0.3); color: var(--accent-cyan); padding: 5px 15px; border-radius: 20px; font-size: 0.85rem; margin-bottom: 20px; }
-        h1 { font-size: 4rem; line-height: 1.1; margin-bottom: 20px; font-weight: 800; }
-        .subtitle { color: var(--text-muted); font-size: 1.2rem; max-width: 600px; margin: 0 auto 40px; line-height: 1.6; }
-        .cta-group { display: flex; justify-content: center; gap: 20px; margin-bottom: 80px; }
+        #home-view .hero { text-align: center; padding: 100px 0 60px; }
+        #home-view .pill { display: inline-block; background: rgba(34, 211, 238, 0.1); border: 1px solid rgba(34, 211, 238, 0.3); color: var(--accent-cyan); padding: 5px 15px; border-radius: 20px; font-size: 0.85rem; margin-bottom: 20px; }
+        #home-view h1 { font-size: 4rem; line-height: 1.1; margin-bottom: 20px; font-weight: 800; }
+        #home-view .subtitle { color: var(--text-muted); font-size: 1.2rem; max-width: 600px; margin: 0 auto 40px; line-height: 1.6; }
+        #home-view .cta-group { display: flex; justify-content: center; gap: 20px; margin-bottom: 80px; }
         
-        .btn-primary { background: var(--btn-gradient); padding: 15px 35px; border-radius: 8px; color: white; text-decoration: none; font-weight: 700; display: flex; align-items: center; gap: 10px; transition: transform 0.2s; }
-        .btn-secondary { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); padding: 15px 35px; border-radius: 8px; color: white; text-decoration: none; font-weight: 600; display: flex; align-items: center; gap: 10px; }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(34, 211, 238, 0.3); }
+        #home-view .btn-primary { background: var(--btn-gradient); padding: 15px 35px; border-radius: 8px; color: white; text-decoration: none; font-weight: 700; display: flex; align-items: center; gap: 10px; transition: transform 0.2s; }
+        #home-view .btn-secondary { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); padding: 15px 35px; border-radius: 8px; color: white; text-decoration: none; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+        #home-view .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(34, 211, 238, 0.3); }
 
         /* Stats */
-        .stats { display: flex; justify-content: space-around; text-align: center; padding: 40px 0; border-bottom: 1px solid rgba(255,255,255,0.05); margin-bottom: 80px; }
-        .stat-item h3 { font-size: 2rem; margin-bottom: 5px; }
-        .stat-item p { color: var(--accent-cyan); font-size: 0.9rem; }
+        #home-view .stats { display: flex; justify-content: space-around; text-align: center; padding: 40px 0; border-bottom: 1px solid rgba(255,255,255,0.05); margin-bottom: 80px; }
+        #home-view .stat-item h3 { font-size: 2rem; margin-bottom: 5px; }
+        #home-view .stat-item p { color: var(--accent-cyan); font-size: 0.9rem; }
 
-        /* Terminal - Animation Specifics */
-        .terminal-container {
-            max-width: 900px;
-            margin: 0 auto 100px;
-            background: #000;
-            border-radius: 10px;
-            border: 1px solid #1f2937;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            overflow: hidden;
-            font-family: 'JetBrains Mono', monospace;
-            min-height: 480px; /* Prevent layout jump */
+        /* Terminal */
+        #home-view .terminal-container {
+            max-width: 900px; margin: 0 auto 100px; background: #000; border-radius: 10px;
+            border: 1px solid #1f2937; box-shadow: 0 20px 50px rgba(0,0,0,0.5); overflow: hidden;
+            font-family: 'JetBrains Mono', monospace; min-height: 480px;
         }
-
-        .terminal-header { background: #111827; padding: 10px 15px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #1f2937; }
-        .dot { width: 12px; height: 12px; border-radius: 50%; }
-        .red { background: #ef4444; }
-        .yellow { background: #f59e0b; }
-        .green { background: #10b981; }
-        .terminal-title { margin-left: auto; margin-right: auto; color: #6b7280; font-size: 0.8rem; }
-
-        .terminal-body { padding: 20px; color: #d1d5db; font-size: 0.9rem; line-height: 1.5; }
-        
-        .cmd { color: #10b981; }
-        .highlight-cmd { color: #facc15; font-weight: bold; }
-        
-        /* Blinking Cursor Animation */
-        .cursor {
-            display: inline-block;
-            width: 8px;
-            height: 15px;
-            background-color: #d1d5db;
-            animation: blink 1s step-end infinite;
-            vertical-align: middle;
-            margin-left: 2px;
-        }
-
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0; }
-        }
+        #home-view .terminal-header { background: #111827; padding: 10px 15px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #1f2937; }
+        #home-view .dot { width: 12px; height: 12px; border-radius: 50%; }
+        #home-view .red { background: #ef4444; }
+        #home-view .yellow { background: #f59e0b; }
+        #home-view .green { background: #10b981; }
+        #home-view .terminal-title { margin-left: auto; margin-right: auto; color: #6b7280; font-size: 0.8rem; }
+        #home-view .terminal-body { padding: 20px; color: #d1d5db; font-size: 0.9rem; line-height: 1.5; }
+        #home-view .cmd { color: #10b981; }
+        #home-view .highlight-cmd { color: #facc15; font-weight: bold; }
+        #home-view .cursor { display: inline-block; width: 8px; height: 15px; background-color: #d1d5db; animation: blink 1s step-end infinite; vertical-align: middle; margin-left: 2px; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
         /* Features */
-        .features-section { padding-bottom: 100px; }
-        .features-header { text-align: center; margin-bottom: 60px; }
-        .features-header h2 { font-size: 2.5rem; margin-bottom: 15px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px; }
-        .card { background: var(--card-bg); border: 1px solid rgba(255,255,255,0.05); padding: 30px; border-radius: 16px; transition: transform 0.3s; }
-        .card:hover { transform: translateY(-5px); border-color: var(--accent-blue); }
-        .card-icon { width: 50px; height: 50px; background: rgba(34, 211, 238, 0.1); color: var(--accent-cyan); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 20px; }
-        .card h3 { font-size: 1.25rem; margin-bottom: 15px; }
-        .feature-list { list-style: none; }
-        .feature-list li { margin-bottom: 10px; color: var(--text-muted); display: flex; align-items: center; gap: 10px; font-size: 0.9rem; }
-        .feature-list li i { color: #10b981; font-size: 0.8rem; }
-        .card p { color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; }
+        #home-view .features-section { padding-bottom: 100px; }
+        #home-view .features-header { text-align: center; margin-bottom: 60px; }
+        #home-view .features-header h2 { font-size: 2.5rem; margin-bottom: 15px; }
+        #home-view .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px; }
+        #home-view .card { background: var(--card-bg); border: 1px solid rgba(255,255,255,0.05); padding: 30px; border-radius: 16px; transition: transform 0.3s; }
+        #home-view .card:hover { transform: translateY(-5px); border-color: var(--accent-blue); }
+        #home-view .card-icon { width: 50px; height: 50px; background: rgba(34, 211, 238, 0.1); color: var(--accent-cyan); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 20px; }
+        #home-view .card h3 { font-size: 1.25rem; margin-bottom: 15px; }
+        #home-view .feature-list { list-style: none; }
+        #home-view .feature-list li { margin-bottom: 10px; color: var(--text-muted); display: flex; align-items: center; gap: 10px; font-size: 0.9rem; }
+        #home-view .feature-list li i { color: #10b981; font-size: 0.8rem; }
+        #home-view .card p { color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; }
+        #home-view footer { border-top: 1px solid rgba(255,255,255,0.05); padding: 40px 0; text-align: center; color: var(--text-muted); font-size: 0.9rem; }
+        #home-view footer a { color: var(--text-muted); text-decoration: none; }
+        #home-view footer a:hover { color: var(--accent-cyan); }
 
-        footer { border-top: 1px solid rgba(255,255,255,0.05); padding: 40px 0; text-align: center; color: var(--text-muted); font-size: 0.9rem; }
-        footer a { color: var(--text-muted); text-decoration: none; }
-        footer a:hover { color: var(--accent-cyan); }
+        /* --- GUIDE SPECIFIC STYLES --- */
+        #guide-view {
+            --g-bg-color: #0f172a;
+            --g-sidebar-bg: #1e293b;
+            --g-text-color: #e2e8f0;
+            --g-heading-color: #f8fafc;
+            --g-accent-color: #38bdf8;
+            --g-code-bg: #334155;
+            --g-border-color: #475569;
+            --g-card-hover-bg: #273549;
+            
+            background-color: var(--g-bg-color);
+            color: var(--g-text-color);
+            display: none; /* Hidden by default */
+            min-height: 100vh;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        #guide-view.active { display: flex; }
+
+        @keyframes slideInLeft { from { transform: translateX(-20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* Guide Sidebar */
+        #guide-view .sidebar {
+            width: 280px; background-color: var(--g-sidebar-bg); padding: 2rem;
+            position: fixed; height: 100vh; overflow-y: auto; border-right: 1px solid var(--g-border-color);
+            display: flex; flex-direction: column; box-shadow: 4px 0 15px rgba(0,0,0,0.3); z-index: 100;
+        }
+        #guide-view .logo-g {
+            font-size: 1.8rem; font-weight: 800; color: var(--g-accent-color); margin-bottom: 2.5rem;
+            display: flex; align-items: center; gap: 12px; animation: slideInLeft 0.5s ease-out; letter-spacing: -0.5px;
+        }
+        #guide-view .nav-links-g { list-style: none; padding: 0; margin: 0; }
+        #guide-view .nav-links-g li { margin-bottom: 0.5rem; animation: slideInLeft 0.5s ease-out backwards; }
+        #guide-view .nav-links-g li:nth-child(1) { animation-delay: 0.1s; }
+        #guide-view .nav-links-g li:nth-child(2) { animation-delay: 0.15s; }
+        #guide-view .nav-links-g a {
+            color: var(--g-text-color); text-decoration: none; display: block; padding: 0.75rem 1rem;
+            border-radius: 8px; font-weight: 500; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid transparent;
+        }
+        #guide-view .nav-links-g a:hover {
+            background-color: rgba(56, 189, 248, 0.15); color: var(--g-accent-color);
+            transform: translateX(5px); border-color: rgba(56, 189, 248, 0.1);
+        }
+        #guide-view .back-btn { margin-bottom: 2rem; border-bottom: 1px solid var(--g-border-color); padding-bottom: 1rem; }
+        #guide-view .contact-box {
+            margin-top: auto; padding: 1.5rem; background: linear-gradient(145deg, rgba(56, 189, 248, 0.1), rgba(56, 189, 248, 0.05));
+            border-radius: 12px; border: 1px solid rgba(56, 189, 248, 0.2); animation: fadeIn 0.8s ease-out 0.5s backwards;
+        }
+
+        /* Guide Main Content */
+        #guide-view .main-content { margin-left: 280px; padding: 4rem 6rem; width: 100%; max-width: 1000px; margin-right: auto; }
+        #guide-view h1, #guide-view h2, #guide-view h3 { color: var(--g-heading-color); font-weight: 700; letter-spacing: -0.5px; }
+        #guide-view h1 {
+            margin-top: 0; font-size: 3rem; background: linear-gradient(to right, var(--g-accent-color), #818cf8);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 1.5rem;
+        }
+        #guide-view h2 {
+            border-bottom: 1px solid var(--g-border-color); padding-bottom: 0.75rem; margin-top: 3rem;
+            margin-bottom: 1.5rem; font-size: 2rem; display: flex; align-items: center; gap: 10px;
+        }
+        #guide-view p, #guide-view ul { line-height: 1.7; font-size: 1.05rem; color: #cbd5e1; margin-bottom: 1.5rem; }
+        
+        #guide-view pre { background-color: #020617; padding: 1.5rem; border-radius: 12px; border: 1px solid var(--g-border-color); overflow-x: auto; }
+        #guide-view code {
+            background-color: rgba(51, 65, 85, 0.5); padding: 0.2rem 0.4rem; border-radius: 4px;
+            font-family: 'Consolas', 'Monaco', monospace; font-size: 0.9em; color: #7dd3fc;
+        }
+        #guide-view pre code { background: none; padding: 0; color: #e2e8f0; }
+
+        /* Tweak Cards */
+        #guide-view .tweak-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; }
+        #guide-view .tweak-card {
+            background-color: var(--g-sidebar-bg); border: 1px solid var(--g-border-color);
+            border-radius: 12px; padding: 1.5rem; transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s;
+            height: 100%; display: flex; flex-direction: column;
+        }
+        #guide-view .tweak-card:hover {
+            transform: translateY(-4px); box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+            background-color: var(--g-card-hover-bg); border-color: var(--g-accent-color);
+        }
+        #guide-view .tweak-card h4 {
+            margin-top: 0; color: var(--g-accent-color); font-family: 'Consolas', monospace;
+            font-size: 1.1rem; margin-bottom: 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 0.5rem;
+        }
+        #guide-view .tweak-card p { font-size: 0.95rem; color: #94a3b8; margin-bottom: 0; flex-grow: 1; }
+        #guide-view .folder-tree {
+            font-family: 'Consolas', monospace; white-space: pre; color: #e2e8f0; background: #020617;
+            padding: 1.5rem; border-radius: 12px; border: 1px solid var(--g-border-color); overflow-x: auto;
+            line-height: 1.5; font-size: 0.95rem;
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-dark); }
+        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #64748b; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <nav>
-            <a href="https://github.com/Shiro1337z/Shiro-Optimizer" class="logo">
-                <i class="fas fa-terminal"></i> SHIRO<span style="color:var(--accent-cyan)">OPTIMIZER</span>
-            </a>
-            <div class="nav-links">
-                <a href="#features">Features</a>
-                <a href="#demo">Demo</a>
-                <a href="#security">Security</a>
-            </div>
-            <a href="https://github.com/Shiro1337z/Shiro-Optimizer/releases" class="btn-nav" target="_blank">Download v2.6.1</a>
-        </nav>
-
-        <section class="hero">
-            <div class="pill"><span class="dot green" style="display:inline-block; width:8px; height:8px; margin-right:5px;"></span> v2.6.1 Stable Release</div>
-            <h1>Reclaim Your<br><span class="highlight">System Performance</span></h1>
-            <p class="subtitle">The open-source, all-in-one optimizer for Windows. Debloat, secure, and accelerate your PC with a single tool.</p>
-            
-            <div class="cta-group">
-                <a href="https://github.com/Shiro1337z/Shiro-Optimizer/releases" class="btn-primary" target="_blank"><i class="fas fa-download"></i> Download Shiro</a>
-                <a href="https://github.com/Shiro1337z/Shiro-Optimizer" class="btn-secondary" target="_blank"><i class="fas fa-code"></i> View Source</a>
-            </div>
-        </section>
-
-        <section class="stats">
-            <div class="stat-item"><h3>100%</h3><p>Free & Open Source</p></div>
-            <div class="stat-item"><h3>FPS+</h3><p>Gaming Optimization</p></div>
-            <div class="stat-item"><h3>0</h3><p>Bloatware Left</p></div>
-            <div class="stat-item"><h3>Secure</h3><p>Integrated Scanners</p></div>
-        </section>
-
-        <section class="terminal-container" id="demo">
-            <div class="terminal-header">
-                <div class="dot red"></div>
-                <div class="dot yellow"></div>
-                <div class="dot green"></div>
-                <div class="terminal-title">Administrator: Shiro Optimizer</div>
-            </div>
-            <div class="terminal-body" id="terminal-content"></div>
-        </section>
-
-        <section class="features-section" id="features">
-            <div class="features-header">
-                <p style="color:var(--accent-cyan); font-weight:700; margin-bottom:10px;">CAPABILITIES</p>
-                <h2>Complete System Control</h2>
-                <p class="subtitle">Shiro combines deep system tweaks with essential utility management.</p>
-            </div>
-            <div class="grid">
-                <div class="card">
-                    <div class="card-icon"><i class="fas fa-tachometer-alt"></i></div>
-                    <h3>System Optimization</h3>
-                    <ul class="feature-list">
-                        <li><i class="fas fa-check-circle"></i> Registry Optimizations</li>
-                        <li><i class="fas fa-check-circle"></i> Disable Telemetry & Tracking</li>
-                        <li><i class="fas fa-check-circle"></i> Full Windows Activation</li>
-                    </ul>
+    <div id="home-view" class="view-section">
+        <div class="container">
+            <nav>
+                <a href="https://github.com/Shiro1337z/Shiro-Optimizer" class="logo">
+                    <i class="fas fa-terminal"></i> SHIRO<span style="color:var(--accent-cyan)">OPTIMIZER</span>
+                </a>
+                <div class="nav-links">
+                    <button onclick="toggleView('guide')">Guide & Information</button>
+                    <a href="#features">Features</a>
+                    <a href="#demo">Demo</a>
+                    <a href="#security">Security</a>
                 </div>
-                <div class="card">
-                    <div class="card-icon"><i class="fas fa-trash-alt"></i></div>
-                    <h3>Bloatware Removal</h3>
-                    <p style="margin-bottom:15px;">Eradicate pre-installed junk.</p>
-                    <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                        <span class="pill" style="margin:0; padding:2px 10px; font-size:0.75rem;">OneDrive</span>
-                        <span class="pill" style="margin:0; padding:2px 10px; font-size:0.75rem;">Cortana</span>
-                        <span class="pill" style="margin:0; padding:2px 10px; font-size:0.75rem;">Edge</span>
+                <a href="https://github.com/Shiro1337z/Shiro-Optimizer/releases" class="btn-nav" target="_blank">Download v2.6.1</a>
+            </nav>
+
+            <section class="hero">
+                <div class="pill"><span class="dot green" style="display:inline-block; width:8px; height:8px; margin-right:5px; background:#10b981; border-radius:50%;"></span> v2.6.1 Stable Release</div>
+                <h1>Boost Your<br><span class="highlight">System Performance</span></h1>
+                <p class="subtitle">The open-source, all-in-one optimizer for Windows. Debloat, secure, and accelerate your PC with a single tool.</p>
+                
+                <div class="cta-group">
+                    <a href="https://github.com/Shiro1337z/Shiro-Optimizer/releases" class="btn-primary" target="_blank"><i class="fas fa-download"></i> Download The Optimizer</a>
+                    <a href="https://github.com/Shiro1337z/Shiro-Optimizer" class="btn-secondary" target="_blank"><i class="fas fa-code"></i> View Source</a>
+                </div>
+            </section>
+
+            <section class="stats">
+                <div class="stat-item"><h3>100%</h3><p>Free & Open Source</p></div>
+                <div class="stat-item"><h3>FPS+</h3><p>Gaming Optimization</p></div>
+                <div class="stat-item"><h3>0</h3><p>Bloatware Left</p></div>
+                <div class="stat-item"><h3>Secure</h3><p>Integrated Scanners</p></div>
+            </section>
+
+            <section class="terminal-container" id="demo">
+                <div class="terminal-header">
+                    <div class="dot red"></div>
+                    <div class="dot yellow"></div>
+                    <div class="dot green"></div>
+                    <div class="terminal-title">Administrator: Shiro Optimizer</div>
+                </div>
+                <div class="terminal-body" id="terminal-content"></div>
+            </section>
+
+            <section class="features-section" id="features">
+                <div class="features-header">
+                    <p style="color:var(--accent-cyan); font-weight:700; margin-bottom:10px;">CAPABILITIES</p>
+                    <h2>Complete System Control</h2>
+                    <p class="subtitle">Shiro combines deep system tweaks with essential utility management.</p>
+                </div>
+                <div class="grid">
+                    <div class="card">
+                        <div class="card-icon"><i class="fas fa-tachometer-alt"></i></div>
+                        <h3>System Optimization</h3>
+                        <ul class="feature-list">
+                            <li><i class="fas fa-check-circle"></i> Registry Optimizations</li>
+                            <li><i class="fas fa-check-circle"></i> Disable Telemetry & Tracking</li>
+                            <li><i class="fas fa-check-circle"></i> Full Windows Activation</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon"><i class="fas fa-trash-alt"></i></div>
+                        <h3>Bloatware Removal</h3>
+                        <p style="margin-bottom:15px;">Eradicate pre-installed junk.</p>
+                        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                            <span class="pill" style="margin:0; padding:2px 10px; font-size:0.75rem;">OneDrive</span>
+                            <span class="pill" style="margin:0; padding:2px 10px; font-size:0.75rem;">Cortana</span>
+                            <span class="pill" style="margin:0; padding:2px 10px; font-size:0.75rem;">Edge</span>
+                        </div>
+                    </div>
+                    <div class="card" id="security">
+                        <div class="card-icon"><i class="fas fa-shield-alt"></i></div>
+                        <h3>Security Suite</h3>
+                        <p>Instantly download and run "Second Opinion" scanners.</p>
+                        <ul class="feature-list" style="margin-top:10px; display:grid; grid-template-columns: 1fr 1fr;">
+                            <li><i class="fas fa-circle" style="font-size:0.4rem; color:var(--accent-blue)"></i> Malwarebytes</li>
+                            <li><i class="fas fa-circle" style="font-size:0.4rem; color:var(--accent-blue)"></i> HitmanPro</li>
+                            <li><i class="fas fa-circle" style="font-size:0.4rem; color:var(--accent-blue)"></i> AdwCleaner</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon"><i class="fas fa-gamepad"></i></div>
+                        <h3>Gaming Mode</h3>
+                        <p>Optimizes your PC for low latency. Includes <strong>NVCleanstall</strong> for minimal NVIDIA drivers and <strong>Discord</strong> optimization (OpenAsar).</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon"><i class="fas fa-palette"></i></div>
+                        <h3>Mica & Visuals</h3>
+                        <p>Bring the modern Windows 11 aesthetics to Explorer with Mica effects integration and custom personalization tweaks.</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon"><i class="fas fa-rocket"></i></div>
+                        <h3>AIO Mode</h3>
+                        <p>The "All-In-One" command. Sit back and let Shiro automate the entire optimization process in one click.</p>
                     </div>
                 </div>
-                <div class="card" id="security">
-                    <div class="card-icon"><i class="fas fa-shield-alt"></i></div>
-                    <h3>Security Suite</h3>
-                    <p>Instantly download and run "Second Opinion" scanners.</p>
-                    <ul class="feature-list" style="margin-top:10px; display:grid; grid-template-columns: 1fr 1fr;">
-                        <li><i class="fas fa-circle" style="font-size:0.4rem; color:var(--accent-blue)"></i> Malwarebytes</li>
-                        <li><i class="fas fa-circle" style="font-size:0.4rem; color:var(--accent-blue)"></i> HitmanPro</li>
-                        <li><i class="fas fa-circle" style="font-size:0.4rem; color:var(--accent-blue)"></i> AdwCleaner</li>
-                    </ul>
-                </div>
-                <div class="card">
-                    <div class="card-icon"><i class="fas fa-gamepad"></i></div>
-                    <h3>Gaming Mode</h3>
-                    <p>Optimizes your PC for low latency. Includes <strong>NVCleanstall</strong> for minimal NVIDIA drivers and <strong>Discord</strong> optimization (OpenAsar).</p>
-                </div>
-                <div class="card">
-                    <div class="card-icon"><i class="fas fa-palette"></i></div>
-                    <h3>Mica & Visuals</h3>
-                    <p>Bring the modern Windows 11 aesthetics to Explorer with Mica effects integration and custom personalization tweaks.</p>
-                </div>
-                <div class="card">
-                    <div class="card-icon"><i class="fas fa-rocket"></i></div>
-                    <h3>AIO Mode</h3>
-                    <p>The "All-In-One" command. Sit back and let Shiro automate the entire optimization process in one click.</p>
+            </section>
+
+            <footer>
+                <a href="https://github.com/Shiro1337z/Shiro-Optimizer" target="_blank"><p>SHIRO<strong>OPTIMIZER</strong></p></a>
+                <p style="margin-top:10px; font-size:0.8rem;">Open source Windows optimization utility.</p>
+                <br>
+                <p>&copy; 2026 Shiro Project. Distributed under MIT License.</p>
+            </footer>
+        </div>
+    </div>
+
+    <div id="guide-view" class="view-section">
+        <nav class="sidebar">
+            <div class="logo-g">🚀 Shiro Docs</div>
+            <ul class="nav-links-g">
+                <li class="back-btn"><a href="#" onclick="toggleView('home')">← Back to Home</a></li>
+                <li><a href="#introduction">Introduction</a></li>
+                <li><a href="#structure">Folder Structure</a></li>
+                <li><a href="#tweaks">Tweaks Explained</a></li>
+                <li><a href="#security-g">Security Tools</a></li>
+                <li><a href="#usage">Usage Guide</a></li>
+                <li><a href="#contact">Contact & Support</a></li>
+            </ul>
+            
+            <div class="contact-box">
+                <strong style="display:block; margin-bottom:0.5rem; color:#f8fafc;">Need Help?</strong>
+                <span style="font-size: 0.9rem; color:#94a3b8;">Contact Dev on Discord:</span><br>
+                <div style="margin-top:0.5rem; display:flex; align-items:center; gap:8px;">
+                    <span style="width:8px; height:8px; background:#22c55e; border-radius:50%; display:inline-block;"></span>
+                    <code style="background:rgba(0,0,0,0.2); padding:4px 8px; font-weight:bold; font-size: 1rem; color:#fff;">rfgdtd</code>
                 </div>
             </div>
-        </section>
+        </nav>
 
-        <footer>
-            <a href="https://github.com/Shiro1337z/Shiro-Optimizer" target="_blank"><p>SHIRO<strong>OPTIMIZER</strong></p></a>
-            <p style="margin-top:10px; font-size:0.8rem;">Open source Windows optimization utility.</p>
-            <br>
-            <p>&copy; 2026 Shiro Project. Distributed under MIT License.</p>
-        </footer>
+        <main class="main-content">
+            <section id="introduction">
+                <h1>Introduction</h1>
+                <p style="font-size: 1.25rem; color: #94a3b8;">Welcome to the <strong>Shiro Optimizer</strong> documentation.</p>
+                <p>This tool is a comprehensive Python-based utility designed to optimize, debloat, and secure Windows 10 and 11 systems. It combines powerful batch scripts, PowerShell automation, and trusted third-party tools into a unified "Hacker-style" interface.</p>
+            </section>
+
+            <section id="structure">
+                <h2>📂 Folder Structure</h2>
+                <div class="folder-tree">
+C:\Users\Razvan\Desktop\tweak my pc please\
+├── <span style="color:#38bdf8">addons/</span>                  <span style="color:#64748b"># Internal Python logic & UI components</span>
+├── <span style="color:#38bdf8">configs/</span>                 <span style="color:#64748b"># Configuration files (JSON)</span>
+├── <span style="color:#38bdf8">The second opinion/</span>      <span style="color:#64748b"># Backup folder for Security Scanners</span>
+├── <span style="color:#38bdf8">tweaks/</span>                  <span style="color:#64748b"># Core scripts (.bat, .ps1)</span>
+└── <span style="color:#facc15">main.py</span>                  <span style="color:#64748b"># The main executable script</span>
+                </div>
+                <ul>
+                    <li><strong>addons:</strong> Contains the backend logic, UI libraries, and utility scripts.</li>
+                    <li><strong>configs:</strong> Stores user preferences and default settings.</li>
+                    <li><strong>tweaks:</strong> The heart of the optimization. Contains all batch and PowerShell scripts.</li>
+                </ul>
+            </section>
+
+            <section id="tweaks">
+                <h2>⚙️ Tweaks Explained</h2>
+                <p>Below is a detailed breakdown of every script found in the <code>tweaks/</code> directory.</p>
+                <div class="tweak-grid">
+                    <div class="tweak-card"><h4>basicstuff.bat</h4><p>Applies fundamental Explorer preferences and visual effects optimizations.</p></div>
+                    <div class="tweak-card"><h4>Bloatware.bat</h4><p>Aggressively removes OEM bloatware and unnecessary Microsoft store apps.</p></div>
+                    <div class="tweak-card"><h4>changedns.bat</h4><p>Configures network adapters to use high-speed, privacy-focused DNS.</p></div>
+                    <div class="tweak-card"><h4>disable_edge_backround.bat</h4><p>Prevents Edge processes from lingering in the background.</p></div>
+                    <div class="tweak-card"><h4>disable_suggestions.bat</h4><p>Disables "Tips and Suggestions" and ads in the UI.</p></div>
+                    <div class="tweak-card"><h4>disable_wencryption.bat</h4><p>Disables NTFS Write Encryption for better I/O performance.</p></div>
+                    <div class="tweak-card"><h4>edge_vanisher.ps1</h4><p>Strips deep integrations of Microsoft Edge from the OS.</p></div>
+                    <div class="tweak-card"><h4>enablelongspaths.bat</h4><p>Removes the legacy 260-character path limit.</p></div>
+                    <div class="tweak-card"><h4>execution policy.bat</h4><p>Sets PowerShell Execution Policy to Bypass for scripts.</p></div>
+                    <div class="tweak-card"><h4>harden ACLs.bat</h4><p>Tightens Access Control Lists on critical system files.</p></div>
+                    <div class="tweak-card"><h4>lats.bat</h4><p>Disables "Last Access Time" updating to reduce disk activity.</p></div>
+                    <div class="tweak-card"><h4>openasar_installer.bat</h4><p>Installs OpenAsar for a faster, lighter Discord.</p></div>
+                    <div class="tweak-card"><h4>optimizations.bat</h4><p>General system responsiveness and priority tweaks.</p></div>
+                    <div class="tweak-card"><h4>privacy-script.bat</h4><p>Disables telemetry, data collection, and tracking services.</p></div>
+                    <div class="tweak-card"><h4>registry_optimizations.bat</h4><p>Modifies Registry for faster menu delays and window snapping.</p></div>
+                    <div class="tweak-card"><h4>shutup_edge.bat</h4><p>Silences Edge update tasks, shortcuts, and nags.</p></div>
+                    <div class="tweak-card"><h4>win11debloat.ps1</h4><p>Integrates Raphire's Win11Debloat script.</p></div>
+                    <div class="tweak-card"><h4>winutil.ps1</h4><p>Integrates Chris Titus Tech's WinUtil toolbox.</p></div>
+                </div>
+            </section>
+
+            <section id="security-g">
+                <h2>🛡️ Security Tools</h2>
+                <div class="tweak-grid" style="grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));">
+                    <div class="tweak-card"><h4>AdwCleaner</h4><p>Best for browser hijackers.</p></div>
+                    <div class="tweak-card"><h4>HitmanPro</h4><p>Cloud-assisted scanner.</p></div>
+                    <div class="tweak-card"><h4>Malwarebytes</h4><p>Comprehensive detection.</p></div>
+                    <div class="tweak-card"><h4>ConfigureDefender</h4><p>Harden Windows Defender.</p></div>
+                </div>
+            </section>
+
+            <section id="usage">
+                <h2>🚀 Usage Guide</h2>
+                <h3>Starting the Program</h3>
+                <pre><code>python main.py</code></pre>
+                
+                <h3>Activation</h3>
+                <ul>
+                    <li><strong>LTSC:</strong> Hybrid "Hacker" method (TSforge + HWID).</li>
+                    <li><strong>Server:</strong> KMS38 activation.</li>
+                    <li><strong>Home/Pro:</strong> HWID (Permanent Digital License).</li>
+                </ul>
+
+                <h3>AIO Mode</h3>
+                <p>Select <strong>Option 0</strong> to run "All-In-One" mode for full automation.</p>
+            </section>
+
+            <section id="contact">
+                <h2>💬 Contact & Support</h2>
+                <div class="tweak-card" style="border-left: 4px solid var(--g-accent-color); background: linear-gradient(to right, rgba(56, 189, 248, 0.05), transparent);">
+                    <h3>Discord Contact</h3>
+                    <p>Username: <strong style="font-size: 1.2rem; color: #fff;">rfgdtd</strong></p>
+                    <p style="margin-top:0.5rem;"><em>Please describe your issue or idea clearly.</em></p>
+                </div>
+            </section>
+        </main>
     </div>
 
     <script>
+        // Toggle Logic
+        function toggleView(viewName) {
+            const home = document.getElementById('home-view');
+            const guide = document.getElementById('guide-view');
+
+            if (viewName === 'guide') {
+                home.style.display = 'none';
+                guide.classList.add('active');
+                window.scrollTo(0, 0);
+            } else {
+                guide.classList.remove('active');
+                home.style.display = 'block';
+                window.scrollTo(0, 0);
+            }
+        }
+
+        // Terminal Animation
         const terminalContent = document.getElementById('terminal-content');
-        
-        // The lines to display, with HTML formatting and delay before the NEXT line appears
         const lines = [
             { text: '<span class="cmd">> Checking internet connection...</span> [OK]', delay: 800 },
             { text: '----------------------------------------', delay: 100 },
             { text: '<span class="cmd">> 🚀 SHIRO OPTIMIZER v2.6.1</span>', delay: 300 },
-            { text: '----------------------------------------', delay: 200 },
-            { text: '<br>', delay: 50 },
-            { text: '[1] Activate Windows', delay: 50 },
-            { text: '[2] System Optimizations', delay: 50 },
-            { text: '[3] Remove MS Bloat', delay: 50 },
-            { text: '[4] Remove 3rd-Party Bloat', delay: 50 },
-            { text: '[5] Install Browser', delay: 50 },
-            { text: '[6] Install Essential Apps', delay: 50 },
-            { text: '[7] Discord Optimization', delay: 50 },
-            { text: '[8] Install Mica Effects', delay: 50 },
-            { text: '[9] Install GPU Tweaks', delay: 50 },
+            { text: '----------------------------------------', delay: 400 },
+            { text: '<br>', delay: 100 },
+            { text: '[1] Activate Windows', delay: 100 },
+            { text: '[2] System Optimizations', delay: 100 },
+            { text: '[3] Remove MS Bloat', delay: 100 },
+            { text: '[4] Remove 3rd-Party Bloat', delay: 100 },
+            { text: '[5] Install Browser', delay: 100 },
+            { text: '[6] Install Essential Apps', delay: 100 },
+            { text: '[7] Discord Optimization', delay: 100 },
+            { text: '[8] Install Mica Effects', delay: 100 },
+            { text: '[9] Install GPU Tweaks', delay: 100 },
             { text: '<span class="highlight-cmd">[0] RUN AIO MODE (Recommended)</span>', delay: 100 },
             { text: '<br>', delay: 100 },
             { text: '<span class="cmd">> Awaiting input...</span>', delay: 400 },
-            { text: '<span class="cmd">user@shiro:~$</span> <span class="cursor"></span>', delay: 0 } // No delay after last line
+            { text: '<span class="cmd">user@shiro:~$</span> <span class="cursor"></span>', delay: 0 }
         ];
 
         async function runTerminal() {
+            if(!terminalContent) return;
             for (let i = 0; i < lines.length; i++) {
                 const div = document.createElement('div');
                 div.innerHTML = lines[i].text;
                 terminalContent.appendChild(div);
-                
-                // Scroll to bottom
                 terminalContent.scrollTop = terminalContent.scrollHeight;
-
-                if (lines[i].delay > 0) {
-                    await new Promise(r => setTimeout(r, lines[i].delay));
-                }
+                if (lines[i].delay > 0) await new Promise(r => setTimeout(r, lines[i].delay));
             }
         }
 
-        // Run animation when page loads
         document.addEventListener('DOMContentLoaded', () => {
             runTerminal();
         });
