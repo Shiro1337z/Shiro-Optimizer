@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentation - Shiro Optimizer</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700&family=Plus+Jakarta+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0f172a;
+            --surface: #1e293b;
+            --surface-transparent: rgba(30, 41, 59, 0.6);
+            --primary: #38bdf8;
+            --primary-glow: rgba(56, 189, 248, 0.4);
+            --secondary: #818cf8;
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: rgba(255, 255, 255, 0.08);
+            --font-heading: 'Plus Jakarta Sans', sans-serif;
+            --font-body: 'Outfit', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --header-height: 80px;
+            --sidebar-width: 300px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: var(--font-body);
+            line-height: 1.7;
+            overflow-x: hidden;
+            font-size: 1.05rem;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Ambient Background (Same as Index) */
+        .background-fx {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            overflow: hidden;
+            background: radial-gradient(circle at top center, #1e293b 0%, #0f172a 80%);
+        }
+
+        .blob {
+            position: absolute;
+            filter: blur(90px);
+            border-radius: 50%;
+            opacity: 0.5;
+            transition: transform 0.2s cubic-bezier(0.2, 0, 0.2, 1);
+        }
+
+        .blob-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background: var(--primary); }
+        .blob-2 { bottom: -10%; right: -10%; width: 40vw; height: 40vw; background: var(--secondary); }
+        .blob-3 { top: 40%; left: 40%; width: 30vw; height: 30vw; background: #6366f1; opacity: 0.3; }
+
+        .noise-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* Header / Navbar */
+        header {
+            height: var(--header-height);
+            padding: 0 2.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(12px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-family: var(--font-heading);
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #fff;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            letter-spacing: -0.02em;
+        }
+
+        .logo span { filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.6)); }
+
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 0.5rem 1.5rem;
+            border-radius: 99px;
+            border: 1px solid var(--border);
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            color: #fff;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+
+        /* Layout Wrapper */
+        .wrapper {
+            display: flex;
+            max-width: 1600px;
+            margin: 0 auto;
+            width: 100%;
+            flex: 1;
+            position: relative;
+        }
+
+        /* Sidebar */
+        aside {
+            width: var(--sidebar-width);
+            height: calc(100vh - var(--header-height));
+            position: sticky;
+            top: var(--header-height);
+            overflow-y: auto;
+            padding: 2rem 0;
+            border-right: 1px solid var(--border);
+            background: rgba(15, 23, 42, 0.4); /* More transparent */
+            backdrop-filter: blur(10px);
+        }
+
+        /* Search Box */
+        .search-box-container {
+            padding: 0 1.5rem 1.5rem;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 0.75rem 1rem 0.75rem 2.8rem;
+            border-radius: 12px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            outline: none;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .search-box input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
+            background: rgba(30, 41, 59, 0.9);
+        }
+
+        .search-box svg {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            pointer-events: none;
+            width: 18px;
+            height: 18px;
+        }
+
+        /* Sidebar Navigation */
+        .nav-section { margin-bottom: 2rem; }
+
+        .nav-title {
+            padding: 0 1.5rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--secondary);
+            margin-bottom: 0.75rem;
+            font-family: var(--font-heading);
+            opacity: 0.9;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 0.5rem 1.5rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.95rem;
+            border-left: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .nav-link:hover {
+            color: #fff;
+            background: rgba(255,255,255,0.03);
+            border-left-color: rgba(255,255,255,0.2);
+        }
+
+        .nav-link.active {
+            color: #fff;
+            border-left-color: var(--primary);
+            background: linear-gradient(90deg, rgba(56, 189, 248, 0.1), transparent);
+            font-weight: 500;
+        }
+
+        /* Main Content */
+        main {
+            flex: 1;
+            padding: 4rem 5rem;
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+
+        .content-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* Typography Override for Docs */
+        h1 {
+            font-family: var(--font-heading);
+            font-size: 3.5rem;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.03em;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+
+        h2 {
+            font-family: var(--font-heading);
+            font-size: 2rem;
+            margin: 4rem 0 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border);
+            color: #fff;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            display: flex;
+            align-items: center;
+        }
+
+        h2::before {
+            content: '#';
+            color: var(--primary);
+            opacity: 0.4;
+            margin-right: 0.5rem;
+            font-weight: 400;
+        }
+
+        h3 {
+            font-family: var(--font-heading);
+            font-size: 1.4rem;
+            margin: 2.5rem 0 1rem;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        h4 {
+            font-family: var(--font-heading);
+            font-size: 1rem;
+            margin: 1.5rem 0 0.5rem;
+            color: var(--secondary);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        p { margin-bottom: 1.5rem; color: var(--text-muted); font-size: 1.05rem; }
+        ul { margin-bottom: 2rem; padding-left: 1.5rem; color: var(--text-muted); }
+        li { margin-bottom: 0.5rem; }
+        
+        strong { color: #fff; font-weight: 600; }
+
+        /* Components */
+        
+        /* Code Blocks */
+        .code-block {
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            margin: 2rem 0;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1.25rem;
+            background: rgba(255,255,255,0.03);
+            border-bottom: 1px solid var(--border);
+            font-family: var(--font-heading);
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        pre {
+            padding: 1.25rem;
+            overflow-x: auto;
+            margin: 0;
+            font-family: var(--font-mono);
+        }
+
+        code {
+            font-family: var(--font-mono);
+        }
+
+        /* Inline Code */
+        p code, li code {
+            background: rgba(56, 189, 248, 0.1);
+            color: #7dd3fc;
+            padding: 0.2em 0.4em;
+            border-radius: 6px;
+            font-size: 0.9em;
+            border: 1px solid rgba(56, 189, 248, 0.1);
+        }
+
+        pre code {
+            background: transparent;
+            color: #e2e8f0;
+            padding: 0;
+            font-size: 0.9rem;
+            border: none;
+        }
+
+        .copy-btn {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 0.35rem 0.85rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 500;
+            font-family: var(--font-heading);
+            transition: all 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            border-color: rgba(255,255,255,0.2);
+        }
+
+        /* Callouts */
+        .callout {
+            background: rgba(56, 189, 248, 0.05);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            padding: 1.5rem;
+            border-radius: 16px;
+            margin: 2rem 0;
+            backdrop-filter: blur(5px);
+        }
+
+        .callout.danger {
+            background: rgba(239, 68, 68, 0.08);
+            border-color: rgba(239, 68, 68, 0.25);
+        }
+
+        .callout-title {
+            font-family: var(--font-heading);
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-size: 1.1rem;
+        }
+        
+        .callout.danger .callout-title { color: #f87171; }
+
+        /* File Tree */
+        .file-tree {
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #94a3b8;
+            background: rgba(15, 23, 42, 0.6);
+            padding: 1.5rem;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            backdrop-filter: blur(10px);
+        }
+        
+        .ft-folder { color: var(--secondary); font-weight: 600; }
+        .ft-file { color: #e2e8f0; }
+        .ft-comment { color: #64748b; font-style: italic; user-select: none; margin-left: 1rem; }
+
+        /* Tables */
+        .data-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin: 2rem 0;
+            font-size: 0.95rem;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            background: rgba(30, 41, 59, 0.4);
+            backdrop-filter: blur(10px);
+        }
+
+        .data-table th, .data-table td {
+            padding: 1.2rem 1.5rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .data-table th {
+            background: rgba(255,255,255,0.03);
+            color: #fff;
+            font-weight: 700;
+            font-family: var(--font-heading);
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.05em;
+        }
+
+        .data-table tr:last-child td { border-bottom: none; }
+        .data-table td { color: var(--text-muted); }
+        .data-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+        /* Back to Top */
+        #backToTop {
+            position: fixed;
+            bottom: 2.5rem;
+            right: 2.5rem;
+            background: var(--primary);
+            color: #0f172a;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(10px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.4);
+            z-index: 100;
+            border: none;
+        }
+
+        #backToTop.visible {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+        }
+
+        #backToTop:hover {
+            transform: translateY(-3px) scale(1.1);
+            box-shadow: 0 0 30px rgba(56, 189, 248, 0.6);
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 2.5rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: rgba(30, 41, 59, 0.9);
+            border: 1px solid var(--primary);
+            color: #fff;
+            padding: 0.75rem 1.75rem;
+            border-radius: 50px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 200;
+            font-size: 0.95rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            aside { display: none; }
+            main { padding: 3rem 2rem; }
+            .nav-links { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="background-fx">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+        <div class="noise-overlay"></div>
+    </div>
+
+    <header>
+        <a href="index.html" class="logo">
+            <span style="font-size: 1.8rem;">⚡</span> Shiro Docs
+        </a>
+        <nav class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="docs.html" class="active">Documentation</a>
+            <a href="https://github.com/Shiro1337z/Shiro-Optimizer" target="_blank">GitHub ↗</a>
+        </nav>
+    </header>
+
+    <div class="wrapper">
+        <aside>
+            <div class="search-box-container">
+                <div class="search-box">
+                    <input type="text" id="navSearch" placeholder="Search docs...">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="nav-content">
+                <div class="nav-section">
+                    <div class="nav-title">Introduction</div>
+                    <a href="#welcome" class="nav-link active">Welcome</a>
+                    <a href="#quick-start" class="nav-link">Quick Start</a>
+                    <a href="#project-structure" class="nav-link">Project Structure</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-title">Tweaks & Scripts</div>
+                    <a href="#basic-tweaks" class="nav-link">Basic System Tweaks</a>
+                    <a href="#bloatware" class="nav-link">Bloatware Removal</a>
+                    <a href="#privacy" class="nav-link">Privacy & Telemetry</a>
+                    <a href="#registry" class="nav-link">Registry & UI</a>
+                    <a href="#network" class="nav-link">Network & DNS</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-title">Advanced</div>
+                    <a href="#win11-debloat" class="nav-link">Win11Debloat Integration</a>
+                    <a href="#context-menu" class="nav-link">Context Menu Tools</a>
+                    <a href="#troubleshooting" class="nav-link">Troubleshooting</a>
+                    <a href="#credits" class="nav-link">Credits</a>
+                </div>
+            </div>
+        </aside>
+
+        <main>
+            <div class="content-container">
+                <section id="welcome">
+                    <h1>Documentation</h1>
+                    <p>Welcome to the comprehensive documentation for <strong>Shiro Optimizer</strong>. This toolkit provides a modular, transparent, and powerful way to optimize Windows 10 and 11.</p>
+                    <div class="callout danger">
+                        <div class="callout-title">⚠️ Critical Warning</div>
+                        <p style="margin:0; font-size: 0.95rem;">The scripts in this toolkit modify core Windows system files, Registry keys, and services. <strong>Always create a System Restore Point</strong> before running any tweak. We are not responsible for any system instability.</p>
+                    </div>
+                </section>
+
+                <section id="quick-start">
+                    <h2>Quick Start</h2>
+                    <p>Follow these steps to safely apply optimizations to your system.</p>
+                    
+                    <h3>1. Prerequisites</h3>
+                    <ul>
+                        <li>Windows 10 (20H2 or later) or Windows 11</li>
+                        <li>Administrator privileges</li>
+                        <li>Internet connection (for downloading dependencies)</li>
+                    </ul>
+
+                    <h3>2. Installation</h3>
+                    <div class="code-block">
+                        <div class="code-header"><span>PowerShell</span> <button class="copy-btn">Copy</button></div>
+                        <pre><code># Clone the repository
+git clone https://github.com/Shiro1337z/Shiro-Optimizer.git
+cd Shiro-Optimizer
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Run the optimizer
+python main.py</code></pre>
+                    </div>
+                </section>
+
+                <section id="project-structure">
+                    <h2>Project Structure</h2>
+                    <p>Shiro is built with modularity in mind. Each tweak is a standalone script located in the <code>tweaks/</code> directory.</p>
+                    <div class="file-tree">
+Shiro-Optimizer/
+├── <span class="ft-folder">addons/</span>               <span class="ft-comment"># Python helper modules (UI, Logic)</span>
+├── <span class="ft-folder">configs/</span>               <span class="ft-comment"># Preset JSON configurations</span>
+├── <span class="ft-folder">docs/</span>                  <span class="ft-comment"># This documentation</span>
+├── <span class="ft-folder">tweaks/</span>                <span class="ft-comment"># THE CORE SCRIPTS</span>
+│   ├── <span class="ft-file">basicstuff.bat</span>         <span class="ft-comment"># UAC & basic settings</span>
+│   ├── <span class="ft-file">Bloatware.bat</span>          <span class="ft-comment"># Massive app removal script</span>
+│   ├── <span class="ft-file">privacy-script.bat</span>     <span class="ft-comment"># privacy.sexy integration</span>
+│   ├── <span class="ft-file">registry_optimizations.bat</span> <span class="ft-comment"># UI & Context Menu tweaks</span>
+│   └── <span class="ft-file">win11debloat.ps1</span>       <span class="ft-comment"># External tool wrapper</span>
+└── <span class="ft-file">main.py</span>                <span class="ft-comment"># Main GUI entry point</span></div>
+                </section>
+
+                <section id="basic-tweaks">
+                    <h2>Basic System Tweaks</h2>
+                    <p>The <code>tweaks/apply_basic_settings.bat</code> script handles foundational Windows settings that improve usability and responsiveness.</p>
+                    
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Feature</th>
+                                <th>Action Taken</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>User Account Control (UAC)</strong></td>
+                                <td>Disables UAC completely (EnableLUA = 0) and suppresses admin consent prompts.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>SmartScreen</strong></td>
+                                <td>Disables SmartScreen filter for Windows Explorer and Microsoft Edge to prevent "Unrecognized App" warnings.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Fast Startup</strong></td>
+                                <td>Disables Hiberboot (Fast Startup) to ensure clean shutdowns and prevent hibernation file bloat.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Mouse Acceleration</strong></td>
+                                <td>Disables "Enhance Pointer Precision" by zeroing out mouse curves for 1:1 raw input (better for gaming).</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Windows.old</strong></td>
+                                <td>Attempts to remove the backup folder from previous Windows installations to free up space.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <section id="bloatware">
+                    <h2>Bloatware Removal</h2>
+                    <p>The <code>tweaks/remove_bloatware.bat</code> script is an aggressive cleaner. It targets pre-installed OEM software, sponsored apps, and unwanted Microsoft integrations.</p>
+                    
+                    <h3>Apps Targeted</h3>
+                    <p>The script iterates through a hardcoded list of Appx packages to remove:</p>
+                    <ul>
+                        <li><strong>Sponsored:</strong> Candy Crush, Netflix, Disney Magic Kingdoms, Spotify, Facebook, Twitter, LinkedIn.</li>
+                        <li><strong>Microsoft Junk:</strong> 3D Viewer, Mixed Reality Portal, Solitaire Collection, Bing News/Weather/Sports/Finance, Get Help, Feedback Hub.</li>
+                        <li><strong>System Integrations:</strong> OneDrive (Full uninstall + folder cleanup), New Outlook (pre-installed web wrapper), Skype.</li>
+                    </ul>
+
+                    <h3>Prevention Mechanisms</h3>
+                    <p>It doesn't just remove apps; it ensures they stay gone:</p>
+                    <div class="code-block">
+                        <div class="code-header"><span>Registry Keys Modified</span></div>
+                        <pre><code># Prevent silent background installation of apps
+HKCU\...\ContentDeliveryManager\SilentInstalledAppsEnabled = 0
+
+# Disable "Suggested Apps" in Start Menu
+HKLM\...\CloudContent\DisableWindowsConsumerFeatures = 1
+
+# Disable Auto-Download in Windows Store
+HKLM\...\WindowsStore\AutoDownload = 2</code></pre>
+                    </div>
+                </section>
+
+                <section id="privacy">
+                    <h2>Privacy & Telemetry</h2>
+                    <p>We use a combination of custom scripts and the renowned <code>privacy.sexy</code> framework (via <code>tweaks/apply_privacy_settings.bat</code>) to lock down data collection.</p>
+
+                    <h3>Network Blocklist</h3>
+                    <p>The script appends over 100 domains to your <code>hosts</code> file, routing them to <code>0.0.0.0</code>. This effectively creates a system-wide blackhole for:</p>
+                    <ul>
+                        <li><code>watson.telemetry.microsoft.com</code> (Error Reporting)</li>
+                        <li><code>vortex.data.microsoft.com</code> (Diagnostics)</li>
+                        <li><code>ads1.msn.com</code> (Advertising)</li>
+                        <li><code>settings-ssl.xboxlive.com</code> (Xbox Analytics)</li>
+                    </ul>
+
+                    <h3>Service Hardening</h3>
+                    <p>The following services are stopped and disabled:</p>
+                    <ul>
+                        <li><strong>DiagTrack:</strong> Connected User Experiences and Telemetry.</li>
+                        <li><strong>dmwappushservice:</strong> WAP Push Message Routing Service (used for telemetry).</li>
+                        <li><strong>WMPNetworkSvc:</strong> Windows Media Player Network Sharing Service.</li>
+                    </ul>
+
+                    <h3>Data Clearing</h3>
+                    <p>The script actively purges logs and history caches:</p>
+                    <ul>
+                        <li>Clears <strong>Event Logs</strong> related to diagnostics.</li>
+                        <li>Deletes <strong>Prefetch</strong> files to reset application launch tracking.</li>
+                        <li>Wipes <strong>Recent Files</strong> lists for Explorer, Office, Paint, and Media Player.</li>
+                        <li>Removes <strong>Visual Studio</strong> telemetry dumps.</li>
+                    </ul>
+                </section>
+
+                <section id="registry">
+                    <h2>Registry & UI Optimizations</h2>
+                    <p>Visual and functional tweaks are handled by <code>tweaks/apply_registry_optimizations.bat</code>.</p>
+
+                    <h3>Taskbar & Start Menu</h3>
+                    <ul>
+                        <li><strong>Windows 11:</strong> Restores the "Classic" context menu (removing the "Show more options" click).</li>
+                        <li><strong>Taskbar:</strong> Aligns icons, forces "End Task" availability in context menu, and shows seconds in the system clock.</li>
+                        <li><strong>Clean Layout:</strong> Removes default pinned items (Edge, Store, Mail) from the taskbar for new users.</li>
+                    </ul>
+
+                    <h3>Visuals</h3>
+                    <ul>
+                        <li>Sets a unified <strong>Accent Color</strong> (Purple/Blue: <code>#6B69D6</code>).</li>
+                        <li>Disables <strong>Lock Screen Spotlight</strong> (random wallpapers and quizzes).</li>
+                        <li>Disables <strong>Transparency Effects</strong> for a slight performance gain.</li>
+                    </ul>
+                </section>
+
+                <section id="network">
+                    <h2>Network & DNS</h2>
+                    <p>The <code>tweaks/configure_dns.bat</code> script changes your network adapter's DNS settings.</p>
+                    <p>By default, it applies the following high-privacy DNS resolvers:</p>
+                    <ul>
+                        <li><strong>Primary:</strong> <code>174.138.21.128</code></li>
+                        <li><strong>Secondary:</strong> <code>188.166.206.224</code></li>
+                    </ul>
+                    <p><em>Note: You can edit the script to use Cloudflare (1.1.1.1) or Google (8.8.8.8) if preferred.</em></p>
+                </section>
+
+                <section id="win11-debloat">
+                    <h2>Win11Debloat Integration</h2>
+                    <p>Shiro includes a wrapper (<code>tweaks/run_win11_debloat.ps1</code>) for the open-source <strong>Win11Debloat</strong> project by Raphire.</p>
+                    <p>This allows you to leverage an external, community-maintained debloater directly from the Shiro interface.</p>
+
+                    <details class="code-block" style="padding: 0;">
+                        <summary style="cursor: pointer; padding: 1rem 1.25rem; font-weight: 600; color: var(--primary); display: flex; align-items: center; justify-content: space-between;">
+                            <span>Show all tweaks performed by Win11Debloat</span>
+                            <span style="font-size: 1.2em;">+</span>
+                        </summary>
+                        <div style="padding: 1.25rem; border-top: 1px solid var(--border);">
+                            <p style="margin-bottom: 1rem; color: #fff;"><strong>Application Removal</strong></p>
+                            <ul style="margin-bottom: 1.5rem;">
+                                <li><strong>Bloatware:</strong> Clipchamp, News, Weather, Xbox, Solitaire, GetHelp, Office Hub, Todo, Photos, Maps, Calculator, Sound Recorder, Alarms.</li>
+                                <li><strong>Gaming:</strong> Xbox App, Xbox Game Bar, Xbox Identity Provider.</li>
+                                <li><strong>Communications:</strong> Mail & Calendar, People, Skype.</li>
+                                <li><strong>HP/OEM:</strong> HP Audio Switch, HP JumpStart, HP Support Assistant, HP Connection Optimizer.</li>
+                            </ul>
+
+                            <p style="margin-bottom: 1rem; color: #fff;"><strong>Interface & UX</strong></p>
+                            <ul style="margin-bottom: 1.5rem;">
+                                <li><strong>Explorer:</strong> Restores classic Navigation Pane (removes Gallery, Home), hides 3D Objects, Music, and Pictures folders.</li>
+                                <li><strong>Taskbar:</strong> Aligns Taskbar to Left (optional), hides Task View, Chat, and Widget buttons.</li>
+                                <li><strong>Context Menu:</strong> Restores Windows 10 "Classic" context menu.</li>
+                                <li><strong>Lock Screen:</strong> Disables Windows Spotlight (ads/trivia).</li>
+                            </ul>
+
+                            <p style="margin-bottom: 1rem; color: #fff;"><strong>System & Privacy</strong></p>
+                            <ul style="margin-bottom: 1.5rem;">
+                                <li><strong>Telemetry:</strong> Disables standard Windows Telemetry and Advertising ID.</li>
+                                <li><strong>Search:</strong> Disables Bing Web Search in the Start Menu.</li>
+                                <li><strong>Copilot & AI:</strong> Disables Windows Copilot, Recall (snapshot history), and AI integration in Paint/Photos.</li>
+                                <li><strong>DVR:</strong> Disables Game DVR (background recording).</li>
+                            </ul>
+                        </div>
+                    </details>
+                </section>
+
+                <section id="context-menu">
+                    <h2>Context Menu Tools</h2>
+                    <p>Shiro injects powerful tools directly into your Desktop right-click menu via Registry keys.</p>
+
+                    <h3>1. Safe Mode Switcher</h3>
+                    <p>Right-click your desktop to instantly reboot into:</p>
+                    <ul>
+                        <li>Safe Mode</li>
+                        <li>Safe Mode with Networking</li>
+                        <li>Safe Mode with Command Prompt</li>
+                        <li>Normal Mode (to exit Safe Mode)</li>
+                    </ul>
+
+                    <h3>2. Power Plan Switcher</h3>
+                    <p>Switch power profiles without digging through Control Panel:</p>
+                    <ul>
+                        <li><strong>Power Saver:</strong> Max battery life.</li>
+                        <li><strong>Balanced:</strong> Default Windows behavior.</li>
+                        <li><strong>High Performance:</strong> Keeps CPU clock high.</li>
+                        <li><strong>Ultimate Performance:</strong> Reduces micro-latencies (enabled by script).</li>
+                    </ul>
+                </section>
+
+                <section id="troubleshooting">
+                    <h2>Troubleshooting</h2>
+                    
+                    <h4>"Access Denied" Errors</h4>
+                    <p>Ensure you are running <code>main.py</code> or the batch scripts as <strong>Administrator</strong>. Many Registry keys are protected.</p>
+
+                    <h4>Internet Not Working</h4>
+                    <p>If the DNS change fails or blocks too much, run:</p>
+                    <pre><code>netsh int ip reset
+ipconfig /flushdns</code></pre>
+
+                    <h4>Reverting Changes</h4>
+                    <p>If you created a System Restore Point as advised, simply restore to that point. Shiro currently does not have a universal "Undo" button due to the destructive nature of debloating (deleted apps cannot be undeleted easily).</p>
+                </section>
+
+                <section id="credits">
+                    <h2>Credits</h2>
+                    <p>Shiro Optimizer stands on the shoulders of giants. This project would not be possible without the incredible work of the open-source community.</p>
+                    
+                    <div class="card" style="background: rgba(129, 140, 248, 0.05); border-color: rgba(129, 140, 248, 0.2); margin-top: 2rem;">
+                        <h3 id="@Credits" style="margin-top: 0; color: var(--secondary); display: flex; align-items: center; gap: 0.5rem;">
+                            <span style="font-size: 1.2em;">@</span> Credits
+                        </h3>
+                        <p>Special thanks to the following developers and tools:</p>
+                        
+                        <ul style="margin-bottom: 0;">
+                            <li><strong>Tallon:</strong> Lead development and architectural design of the Shiro ecosystem.</li>
+                            <li><strong>Raphire (Win11Debloat):</strong> For the comprehensive PowerShell debloating logic used in our integration.</li>
+                            <li><strong>Chris Titus Tech:</strong> For the inspiration and methodology behind the Windows Utility and performance optimizations.</li>
+                            <li><strong>privacy.sexy:</strong> For providing the foundational privacy templates and service hardening logic.</li>
+                            <li><strong>Second Opinion AV:</strong> Integration of advanced malware and PUP scanning modules for system safety.</li>
+                            <li><strong>AdGuard & Cloudflare:</strong> For the high-performance DNS infrastructure used in our network tweaks.</li>
+                        </ul>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <button id="backToTop" title="Back to Top">↑</button>
+    <div id="toast" class="toast">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="var(--primary)" viewBox="0 0 16 16"><path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425a.247.247 0 0 1 .02-.022Z"/></svg>
+        Copied to clipboard!
+    </div>
+
+    <script>
+        // Search Functionality
+        const searchInput = document.getElementById('navSearch');
+        const navLinks = document.querySelectorAll('.nav-link');
+        const navSections = document.querySelectorAll('.nav-section');
+
+        searchInput.addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            
+            navSections.forEach(section => {
+                let hasVisibleLinks = false;
+                const links = section.querySelectorAll('.nav-link');
+                
+                links.forEach(link => {
+                    const text = link.textContent.toLowerCase();
+                    if (text.includes(term)) {
+                        link.style.display = 'block';
+                        hasVisibleLinks = true;
+                    } else {
+                        link.style.display = 'none';
+                    }
+                });
+
+                // Hide section title if no links are visible
+                section.querySelector('.nav-title').style.display = hasVisibleLinks ? 'block' : 'none';
+            });
+        });
+
+        // Toast Notification
+        function showToast() {
+            const toast = document.getElementById('toast');
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+
+        // Copy button functionality
+        document.querySelectorAll('.copy-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const code = btn.parentElement.nextElementSibling.innerText;
+                navigator.clipboard.writeText(code);
+                
+                // Visual feedback on button
+                const originalText = btn.textContent;
+                btn.textContent = 'Copied!';
+                btn.style.color = 'var(--primary)';
+                btn.style.borderColor = 'var(--primary)';
+                
+                showToast();
+
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.style.color = '';
+                    btn.style.borderColor = '';
+                }, 2000);
+            });
+        });
+
+        // Back to Top & Active Link Highlighting (Intersection Observer)
+        const sections = document.querySelectorAll('section');
+        const backToTopBtn = document.getElementById('backToTop');
+
+        // Back to Top Visibility
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) {
+                backToTopBtn.classList.add('visible');
+            } else {
+                backToTopBtn.classList.remove('visible');
+            }
+        });
+
+        // Robust Active Link Highlighting
+        const observerOptions = {
+            root: null,
+            rootMargin: '-20% 0px -60% 0px', // Active band: Top 20% to Bottom 60% of viewport
+            threshold: 0
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.getAttribute('id');
+                    
+                    // Remove active from all
+                    navLinks.forEach(link => link.classList.remove('active'));
+                    
+                    // Add active to current
+                    const activeLink = document.querySelector(`.nav-link[href="#${id}"]`);
+                    if (activeLink) {
+                        activeLink.classList.add('active');
+                        
+                        // Scroll sidebar if needed
+                        activeLink.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    }
+                }
+            });
+        }, observerOptions);
+
+        sections.forEach(section => observer.observe(section));
+
+        // Handle clicks manually to prevent flicker
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                navLinks.forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+            });
+        });
+
+        backToTopBtn.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // Parallax Effect for Background Blobs (Same as Index)
+        document.addEventListener('mousemove', (e) => {
+            const blobs = document.querySelectorAll('.blob');
+            const x = e.clientX / window.innerWidth;
+            const y = e.clientY / window.innerHeight;
+
+            blobs.forEach((blob, index) => {
+                const speed = (index + 1) * 20;
+                const xOffset = (x - 0.5) * speed;
+                const yOffset = (y - 0.5) * speed;
+                blob.style.transform = `translate(${xOffset}px, ${yOffset}px)`;
+            });
+        });
+    </script>
+</body>
+</html>
